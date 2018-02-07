@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>CloudML Tutorial</title>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css"/>
+    <link href="http://terminal.jcubic.pl/css/jquery.terminal.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+  </head>
+  <body>
+    <div class='container'>
+    <div>
+    CloudML allows developers to model the provisioning and deployment of a multi-cloud application.
+    CloudML is also inspired by component-based approaches in order to facilitate separation of concerns and reusability. In this respect,
+    deployment models can be regarded as assemblies of components exposing ports, and bindings between these ports.
+    <br/>
+    <h2>Objective</h2>
+    <div>
+    In this tutorial we will exploit the CloudML JSON syntax to specify a very simple deployment model. The objective is the following: specify the deployment of MongoDB on a small virtual machine.
+    <b>Fill the blank parts in the code snippets below!</b>
+    </div>
+    <br/>
+    <h2>Introduction</h2>
+    A <span style='font-family:"Lucida Console"'>CloudMLModel</span> consists of <span style='font-family:"Lucida Console"'>CloudMLElement</span>s,
+    which can be associated with <span style='font-family:"Lucida Console"'>Property</span> and <span style='font-family:"Lucida Console"'>Resource</span>s. A <span style='font-family:"Lucida Console"'>Resource</span>
+    represents an artefact (e.g., scripts, binaries, configuration files, etc.) adopted to manage
+    the deployment life-cycle (e.g., download, configure, install, start, and stop). The three main
+    types of <span style='font-family:"Lucida Console"'>CloudMLElement</span>s are <span style='font-family:"Lucida Console"'>Component</span>, <span style='font-family:"Lucida Console"'>Communication</span>,
+    and <span style='font-family:"Lucida Console"'>Hosting</span>.
+    </div>
+
+
+
+    <article><h2>Provider</h2>
+    You can specify the set of cloud providers you have access to in the list of  <span style='font-family:"Lucida Console"'>Providers</span>. In order to get access to the provider's API
+    a file containing your credentials has to be defined and the path to this file specify in the <span style='font-family:"Lucida Console"'>credentials</span> attribute. For specific cloud providers,
+    the API's endpoint must be specified as a property attached to the provider definition. This is for instance the case for private instances of Openstack.
+    <pre>
+"providers" : [{
+  "eClass" : "net.cloudml.core:Provider",
+  "name" : "openstack-nova",
+  "credentials" : "credentialsOpenstack",
+  "properties" : [{
+      "eClass" : "net.cloudml.core:Property",
+      "name" : "endPoint",
+      "value" : "<input type="text"/>"
+    }
+  ]
+}],
+    </pre>
+    </article>
+
+    <article>
+      <h2>Components</h2>
+      A <span style='font-family:"Lucida Console"'>Component</span> can be an <span style='font-family:"Lucida Console"'>ExternalComponent</span>, meaning that it is managed by
+      an external <span style='font-family:"Lucida Console"'>Provider</span> (typically a PaaS, e.g., an Amazon Beanstalk container),
+      or an <span style='font-family:"Lucida Console"'>InternalComponent</span>, meaning that it is
+      managed by CloudML.
+
+      <article><h3>Internal Component, type and instance</h2>
+      The following code snippet is used to specify a type of internal component called <span style='font-family:"Lucida Console"'>mongoDB</span>. This component requires and execution platform, which, in this case, is simply an operating system.
+      A <span style='font-family:"Lucida Console"'>resource</span> is attached to this component type describing how to manage its life-cycle. A resource is typically composed of a set of commands, one for each state of the life cycle. Accordingly the possible commands are:
+      <span style='font-family:"Lucida Console"'>uploadCommand</span>, <span style='font-family:"Lucida Console"'>downloadCommand</span>, <span style='font-family:"Lucida Console"'>installCommand</span>, <span style='font-family:"Lucida Console"'>configureCommand</span>, <span style='font-family:"Lucida Console"'>startCommand</span>, <span style='font-family:"Lucida Console"'>stopCommand.</span>
+      <pre>
+"internalComponents" : [{
+  "eClass" : "net.cloudml.core:InternalComponent",
+  "name" : "mongoDB",
+  "resources" : [{
+      "eClass" : "net.cloudml.core:Resource",
+      "name" : "no name",
+      "downloadCommand" : "wget -P ~ http://cloudml.org/scripts/linux/ubuntu/mongoDB/install_mongoDB.sh",
+      "installCommand" : "cd ~; sudo bash install_mongoDB.sh",
+      "requireCredentials" : false,
+      "executeLocally" : false
+    }
+  ],
+  "requiredExecutionPlatform" : {
+    "eClass" : "net.cloudml.core:RequiredExecutionPlatform",
+    "name" : "sl",
+    "owner" : "internalComponents[mongoDB]",
+    "demands" : [{
+        "eClass" : "net.cloudml.core:Property",
+        "name" : "OS",
+        "value" : "Ubuntu"
+      }
+    ]
+  }
+}],
+      </pre>
+      Instances of component can be created from a component type. In the following we specify an instance called <span style='font-family:"Lucida Console"'>mongoDB1</span> of type <span style='font-family:"Lucida Console"'>mongoDB<span>.
+      <pre>
+"internalComponentInstances" : [{
+  "eClass" : "net.cloudml.core:InternalComponentInstance",
+  "name" : "mongoDB1",
+  "type" : "internalComponents[<input type="text"/>]",
+  "requiredExecutionPlatformInstance" : {
+    "eClass" : "net.cloudml.core:RequiredExecutionPlatformInstance",
+    "name" : "sl948010596",
+    "owner" : "internalComponentInstances[mongoDB1]",
+    "type" : "internalComponents[mongoDB]/requiredExecutionPlatform[sl]"
+  }
+}],
+      </pre>
+      </article>
+
+      <article><h3>External Component, type and instance</h2>
+      An <span style='font-family:"Lucida Console"'>ExternalComponent</span> can be a <span style='font-family:"Lucida Console"'>VM</span> (e.g., a VM running GNU-Linux) or a PaaS service.
+      The properties <span style='font-family:"Lucida Console"'>minCores</span>, <span style='font-family:"Lucida Console"'>maxCores</span>, <span style='font-family:"Lucida Console"'>minRam</span>, <span style='font-family:"Lucida Console"'>maxRam</span>, <span style='font-family:"Lucida Console"'>minStorage</span>, and <span style='font-family:"Lucida Console"'>maxStorage</span>
+      represent the lower and upper bounds of virtual compute cores, RAM, and storage, respectively, of the required VM
+      (e.g., <span style='font-family:"Lucida Console"'>minCores</span>=<span style='font-family:"Lucida Console"'>1</span>, <span style='font-family:"Lucida Console"'>minRam</span>='
+      <span style='font-family:"Lucida Console"'>1024</span>). The property <span style='font-family:"Lucida Console"'>sshKey</span> represents the name of the SSH stored on the provider side
+      and that will be used when the VM is created to enable connections using the correspondig <span style='font-family:"Lucida Console"'>privateKey</span>. The property <span style='font-family:"Lucida Console"'>privateKey</span>
+      specifies the path to this privateKey.
+      <pre>
+"vms" : [{
+  "eClass" : "net.cloudml.core:VM",
+  "name" : "SL",
+  "minRam" : "<input type="text"/>",
+  "Region" : "<input type="text"/>",
+  "minCores" : "<input type="text"/>",
+  "minStorage" : "<input type="text"/>",
+  "is64os" : true,
+  "imageId" : "<input type="text"/>",
+  "securityGroup" : "<input type="text"/>",
+  "sshKey" : "<input type="text"/>",
+  "groupName" : "sensapp",
+  "provider" : "providers[openstack-nova]",
+  "privateKey" : "<input type="text"/>",
+  "providedExecutionPlatforms" : [{
+      "eClass" : "net.cloudml.core:ProvidedExecutionPlatform",
+      "name" : "s1Provided",
+      "owner" : "vms[SL]",
+      "offers" : [{
+          "eClass" : "net.cloudml.core:Property",
+          "name" : "OS",
+          "value" : "Ubuntu"
+        }
+      ]
+    }
+  ]
+}],
+      </pre>
+      In the following we specify an instance of VM called <span style='font-family:"Lucida Console"'>sensapp-sl1</span> of type <span style='font-family:"Lucida Console"'>SL<span>.
+      <pre>
+"vmInstances" : [{
+  "eClass" : "net.cloudml.core:VMInstance",
+  "name" : "sensapp-sl1",
+  "type" : "vms[SL]",
+  "providedExecutionPlatformInstances" : [{
+      "eClass" : "net.cloudml.core:ProvidedExecutionPlatformInstance",
+      "name" : "s1Provided1309488529",
+      "owner" : "vmInstances[sensapp-sl1]",
+      "type" : "vms[SL]/providedExecutionPlatforms[s1Provided]"
+    }
+  ]
+}],
+      </pre>
+      </article>
+    </article>
+
+
+    <article><h2>Execute instances</h2>
+    A <span style='font-family:"Lucida Console"'>HostingPort</span> represents a hosting interface of a component. A <span style='font-family:"Lucida Console"'>HostingPort</span> can be a <span style='font-family:"Lucida Console"'>ProvidedHost</span>,
+    meaning that it provides hosting facilities (i.e., it provides an execution environment) to another component,
+    or a <span style='font-family:"Lucida Console"'>RequiredHost</span>, meaning that an internal component requires hosting from another component.
+    <pre>
+"executesInstances" : [{
+  "eClass" : "net.cloudml.core:ExecuteInstance",
+  "name" : "runOn1202166832",
+  "providedExecutionPlatformInstance" : "vmInstances[<input type="text"/>]/providedExecutionPlatformInstances[s1Provided1309488529]",
+  "requiredExecutionPlatformInstance" : "internalComponentInstances[<input type="text"/>]/requiredExecutionPlatformInstance[sl948010596]"
+}]
+    </pre>
+    </article>
+    <article>
+      <h1>Generate your model!</h1> <button type="button" onclick="generate();">Generate!</button><br/>
+      You can now test it using the CloudML web editor!
+    </article>
+  </div>
+  <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+  <script>
+    var JSONDebut="{\"eClass\": \"net.cloudml.core:CloudMLModel\",\"name\": \"Tutorial\",";
+    var JSONEnd="}";
+
+    function generate(){
+      var content="";
+      var listOfPre=document.getElementsByTagName("pre");
+      for(var i = 0; i < listOfPre.length; i++){
+        var element = listOfPre[i];
+        var listInput=document.getElementsByTagName("input");
+        for(var j = 0; j < listInput.length; j++){
+          var input = listInput[j];
+          var val=input.value;
+          $(input).replaceWith(val+"");
+        }
+        content+=element.innerHTML;
+      }
+      var JSON=JSONDebut+content+JSONEnd;
+      window.open("data:text/json,"+JSON);
+    }
+  </script>
+  </body>
+</html>

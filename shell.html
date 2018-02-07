@@ -1,0 +1,492 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>CloudML Tutorial</title>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css"/>
+    <link href="http://terminal.jcubic.pl/css/jquery.terminal.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+  </head>
+  <body>
+    <div class='container'>
+	<div  class="offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;z-index:100000"></div>
+    <div class="row">
+      <div class="col-md-4">
+        <div id="0">
+          <p>CloudML comes along with a shell component, which allows you to load, modify and enact CloudML models. The CloudML shell can be run in two modes: a batch mode and an interactive mode. The batch mode lets you run a single command, whereas the interactive mode lets you input commands in a step-wise fashion.</p>
+          <p>Here on the right, a CloudML shell is available in interactive mode.</p>
+          <p><b>Try to display information about the available commands.</b></p>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>CloudML> help</pre>
+          </div>
+        </div>
+        <div class="exo" id="1">
+          <h1>Load a deployment model</h1>
+          <p>The CloudML shell also provides a set of commands, which enable interaction with the application running in the Cloud. </p>
+          <p>Before actually enacting a deployment, a model has to be loaded in the deployment engine.</p>
+          <p><b>Try to load de deployment model from a file.</b></p>
+          <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Tips</h2>
+          <pre>Let's consider a file called <b>SensAppAdmin.json</b>. <br/>You can explore the content of this file <a href="https://github.com/SINTEF-9012/cloudml/tree/master/docs/samples">here</a></pre>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>load deployment from SensAppAdmin.json</pre>
+          </div>
+        </div>
+        <div class="exo" id="2">
+          <h1>Deploy</h1>
+          <p>Once a deployment models has been loaded in the deployment engine, the deployment can effectively be deployed. </p>
+		  <p><b>Try to Deploy the application.</b></p>
+          <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Tips</h2>
+		  <pre>In this example we are simulating a deployment.<br/>Real deployment may take several minutes.</pre>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>Deploy</pre>
+          </div>
+        </div>
+		<div class="exo" id="3">
+          <h1>List VM instances</h1>
+          <p>Once a deployment has been loaded, informations about the various components that compose your model can be obtained from the shell. Both the list of component instances and types are available.</p>
+		  <p><b>Try to retrieve the list of component instances.</b></p>
+          <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Tips</h2>
+		  <pre>Details on a specific instance or type<br/>can be obtained using the view command</pre>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>list instances</pre>
+          </div>
+        </div>
+        <div class="exo" id="4">
+          <h1>Scale out</h1>
+          <p>It is possible to scale out a VM instance using the scale out command. This command automatically update the model, thus generating the necessary dependencies. Then if needed it creates an image of the VM to be scaled, start a new VM using this image and finally restart all necessary software components installed hosted on this VM.</p>
+		  <p><b>Try to scale the VM called sensapp-sl1.</b></p>
+          <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Tips</h2>
+		  <pre>Names are not uniques whilst IDs are!<br/>IDs are given at deployment-time</pre>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>scale out RegionOne/243472e4-3bfd-499c-8f5f-241946ca58eb</pre>
+          </div>
+        </div>
+        <div class="exo" id="5">
+          <h1>Store deployment</h1>
+          <p>At any time you can save in JSON or XMI format the deployment model currently stored in the memory of the deployment engine.</p>
+		  <p><b>Try to save the scaled model as a JSON file.</b></p>
+          <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Tips</h2>
+		  <pre>The serialization format is automatically<br/>deduced based on the filename's extension.</pre>
+          <div class="answer">
+          <h2><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span> Answer</h2>
+          <pre>store deployment to file.json</pre>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+          <div id="term_demo"></div>
+      </div>
+    </div>
+    </div>
+
+    <footer>
+    </footer>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://terminal.jcubic.pl/js/jquery.terminal-0.8.8.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script>
+
+    var helpResult="Available commands:\n"+
+            " - help [command-name]?\n"+
+            " - exit\n"+
+            " - dump [from <d>]? to <file>\n"+
+            " - replay from <file>\n"+
+            " - history [<depth>]?\n"+
+            " - messages [<depth>]?\n"+
+            " - start <artefact-id>\n"+
+            " - stop <artefact-id>\n"+
+            " - load deployment from <file>\n"+
+            " - store deployment in <file>\n"+
+            " - upload <local-file> on <node-id> at <remote-dir>\n"+
+            " - list types\n"+
+            " - list instances\n"+
+            " - view instance <instance-id>\n"+
+            " - view type <type-id>\n"+
+            " - deploy\n"+
+            " - load credentials from <file>\n"+
+            " - create image from <vm-id>\n"+
+            " - store credentials from <file>\n";
+
+    var header="Copyright (c) 2012 - SINTEF ICT [http://sintef.no]\n"+
+            "\n"+
+            "| e88~-_  888                         888      e    e      888\n"+
+            "|d888   \\ 888  e88~-_  888  888  e88~\\888     d8b  d8b     888\n"+
+            "|d888     888 d888   i 888  888 d888  888    d888bdY88b    888\n"+
+            "|8888     888 8888   | 888  888 8888  888   / Y88Y Y888b   888\n"+
+            "|Y888   / 888 Y888   ' 888  888 Y888  888  /   YY   Y888b  888\n"+
+            "| \"88_-~  888  \"88_-~  \"88_-888  \"88_/888 /          Y888b 888____\n"+
+            "\n"+
+            "This program comes with ABSOLUTELY NO WARRANTY; See LGPL v3 for details.\n"+
+            "This is free software, and you are welcome to redistribute it\n"+
+            "under certain conditions; see LGPL v3 for details.\n\n";
+
+    var loadResult="Info: Will wait until completion\n"+
+                    "Info: Loading Complete.\n";
+
+    var errorLoadResult="Info: Will wait until completion\n"+
+                        "Error: Unable to find file\n";
+
+	var errorScaleResult="Info: Will wait until completion\n"+
+                        "Error: There are no VMs with such ID!\n"
+
+    var storeResult="Info: Will wait until completion\n"+
+                    "Info: Serialisation Complete.\n";
+
+	var errorList="Info:    Component instances:\n"+
+            "   Instance component-> SensApp ::jettySC1\n"+
+            "   Instance component-> SensApp ::sensApp1\n"+
+            "   Instance component-> SensApp ::mongoDB1\n"+
+            "   Instance component-> SensApp ::jettySC2\n"+
+            "   Instance component-> SensApp ::sensAppAdmin1\n"+
+            "   VM-> ::sensapp-sl1\n"+
+            "   VM-> ::sensapp-ml1\n";
+
+	var listResult="Info:    Component instances:\n"+
+            "   Instance component-> SensApp ::jettySC1\n"+
+            "   Instance component-> SensApp ::sensApp1\n"+
+            "   Instance component-> SensApp ::mongoDB1\n"+
+            "   Instance component-> SensApp ::jettySC2\n"+
+            "   Instance component-> SensApp ::sensAppAdmin1\n"+
+            "   VM-> RegionOne/243472e4-3bfd-499c-8f5f-241946ca58eb::sensapp-sl1\n"+
+            "   VM-> RegionOne/4c2d3c73-9c73-48e4-b67f-1ed2b7fdbeed::sensapp-ml1\n";
+
+	var deployResult="2015-04-20 12:57:08 >> Status of: jettySC2 changed in: CONFIGURED\n" +
+                "2015-04-20 12:57:10 >> Updating the model..\n" +
+                "2015-04-20 12:57:10 >> Status of: jettySC2 changed in: RUNNING\n" +
+                "2015-04-20 12:57:10 >> Closing connection ...\n" +
+                "2015-04-20 12:57:10 >> Connecting to openstack-nova ...\n" +
+                "2015-04-20 12:57:10 >> Authenticating ...\n" +
+                "2015-04-20 12:57:11 >> Updating the model..\n" +
+                "2015-04-20 12:57:11 >> Status of: sensAppAdmin1 changed in: CONFIGURED\n" +
+                "2015-04-20 12:57:11 >> executing command...\n" +
+                "2015-04-20 12:57:11 >> cd ~; sudo bash start_sensappadmin.sh\n" +
+                "2015-04-20 12:57:15 >> sudo: unable to resolve host sensapp-sl1\n" +
+                "sudo: unable to resolve host sensapp-sl1\n" +
+                "Stopping Jetty: No process in pidfile '/var/run/jetty.pid' found running; none killed.\n" +
+                "OK\n" +
+                "Starting Jetty: OK\n" +
+                "\n" +
+                "2015-04-20 12:57:17 >> Updating the model..\n" +
+                "2015-04-20 12:57:17 >> Status of: sensAppAdmin1 changed in: RUNNING\n" +
+                "2015-04-20 12:57:17 >> Closing connection ...\n";
+
+	var storeResult="Info: Will wait until completi\n"+
+            "Info: Serialisation Complete.\n";
+
+	var scalingResult="2015-04-20 18:11:07 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:11:07 >> Authenticating ...\n"+
+            "2015-04-20 18:11:08 >> Closing connection ...\n"+
+            "2015-04-20 18:11:08 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:11:08 >> Authenticating ...\n"+
+            "2015-04-20 18:11:10 >> Region: RegionOne\n"+
+            "2015-04-20 18:11:10 >> Provisioning a VM ...\n"+
+            "2015-04-20 18:11:10 >> VM type: RegionOne/1ca87d3d-e035-40d1-8d38-a50654b91a0e on location: RegionOne\n"+
+            "2015-04-20 18:11:32 Looking for status changes..\n"+
+            "2015-04-20 18:11:34 >> Updating the model..\n"+
+            "2015-04-20 18:11:34 >> Status of: SL(no_3)-fromImage(no_3) changed in: PENDING\n"+
+            "2015-04-20 18:12:34 Looking for status changes..\n"+
+            "2015-04-20 18:12:46 >> Running VM: SL(no_3)-fromImage(no_3) Id: RegionOne/1a14ad2d-bd84-4650-8e53-3318d6237992 with public address: [] on OS:{family=unrecognized, name=sensapp-sl1-image, description=sensapp-sl1-image, is64Bit=true} SL(no_3)-fromImage(no_3):SL(no_3)-fromImage(no_3):null\n"+
+            "2015-04-20 18:12:46 >> Closing connection ...\n"+
+            "2015-04-20 18:12:47 >> Updating the model..\n"+
+            "2015-04-20 18:12:47 >> Status of: SL(no_3)-fromImage(no_3) changed in: RUNNING\n"+
+            "2015-04-20 18:12:50 >> Updating the model..\n"+
+            "2015-04-20 18:12:50 >> IP of: SL(no_3)-fromImage(no_3) changed in: 192.168.11.36\n"+
+            "2015-04-20 18:12:50 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:12:50 >> Authenticating ...\n"+
+            "2015-04-20 18:12:51 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:12:51 >> Authenticating ...\n"+
+            "2015-04-20 18:12:51 >> executing command...\n"+
+            "2015-04-20 18:12:51 >> wget -P ~ http://cloudml.org/scripts/linux/ubuntu/sensappAdmin/configure_sensappadmin.sh \"192.168.11.36\" \"192.168.11.4\" 8080\n"+
+            "2015-04-20 18:13:35 Looking for status changes..\n"+
+            "2015-04-20 18:14:08 >> --2015-04-20 16:14:08--  http://cloudml.org/scripts/linux/ubuntu/sensappAdmin/configure_sensappadmin.sh\n"+
+            "Resolving cloudml.org (cloudml.org)... 217.70.180.135, 2001:4b98:dc0:950::135\n"+
+            "Connecting to cloudml.org (cloudml.org)|217.70.180.135|:80... connected.\n"+
+            "HTTP request sent, awaiting response... 200 OK\n"+
+            "Length: 418 [text/x-sh]\n"+
+            "Saving to: `/home/ubuntu/configure_sensappadmin.sh.1'\n"+
+            "\n"+
+            "\n"+
+            " 0% [                                       ] 0           --.-K/s              \n"+
+            "100%[======================================>] 418         --.-K/s   in 0s      \n"+
+            "\n"+
+            "2015-04-20 16:14:08 (41.8 MB/s) - `/home/ubuntu/configure_sensappadmin.sh.1' saved [418/418]\n"+
+            "\n"+
+            "--2015-04-20 16:14:08--  http://192.168.11.36/\n"+
+            "Connecting to 192.168.11.36:80... failed: Connection refused.\n"+
+            "--2015-04-20 16:14:08--  http://192.168.11.4/\n"+
+            "Connecting to 192.168.11.4:80... failed: Connection refused.\n"+
+            "--2015-04-20 16:14:08--  http://8080/\n"+
+            "Resolving 8080 (8080)... 0.0.31.144\n"+
+            "Connecting to 8080 (8080)|0.0.31.144|:80... failed: Invalid argument.\n"+
+            "FINISHED --2015-04-20 16:14:08--\n"+
+            "Total wall clock time: 0.2s\n"+
+            "Downloaded: 1 files, 418 in 0s (41.8 MB/s)\n"+
+            "\n"+
+            "2015-04-20 18:14:08 >> executing command...\n"+
+            "2015-04-20 18:14:08 >> cd ~; sudo bash configure_sensappadmin.sh \"192.168.11.36\" \"192.168.11.4\" 8080\n"+
+            "2015-04-20 18:14:16 >> \n"+
+            "2015-04-20 18:14:16 >> Closing connection ...\n"+
+            "2015-04-20 18:14:16 >> Closing connection ...\n"+
+            "2015-04-20 18:14:18 >> Updating the model..\n"+
+            "2015-04-20 18:14:18 >> Status of: SensAppAdmin(no_5) changed in: INSTALLED\n"+
+            "2015-04-20 18:14:18 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:14:18 >> Authenticating ...\n"+
+            "2015-04-20 18:14:18 >> Closing connection ...\n"+
+            "2015-04-20 18:14:19 >> Updating the model..\n"+
+            "2015-04-20 18:14:19 >> Status of: SensAppAdmin(no_5) changed in: CONFIGURED\n"+
+            "2015-04-20 18:14:21 >> Updating the model..\n"+
+            "2015-04-20 18:14:21 >> Status of: sensApp1 changed in: INSTALLED\n"+
+            "2015-04-20 18:14:21 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:14:21 >> Authenticating ...\n"+
+            "2015-04-20 18:14:21 >> Closing connection ...\n"+
+            "2015-04-20 18:14:22 >> Updating the model..\n"+
+            "2015-04-20 18:14:22 >> Status of: sensApp1 changed in: CONFIGURED\n"+
+            "2015-04-20 18:14:22 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:14:22 >> Authenticating ...\n"+
+            "2015-04-20 18:14:23 >> executing command...\n"+
+            "2015-04-20 18:14:23 >> cd ~; sudo bash start_sensappadmin.sh\n"+
+            "2015-04-20 18:14:31 >> Stopping Jetty: No process in pidfile '/var/run/jetty.pid' found running; none killed.\n"+
+            "OK\n"+
+            "Starting Jetty: OK\n"+
+            "\n"+
+            "2015-04-20 18:14:31 >> Closing connection ...\n"+
+            "2015-04-20 18:14:33 >> Updating the model..\n"+
+            "2015-04-20 18:14:33 >> Status of: SensAppAdmin(no_5) changed in: RUNNING\n"+
+            "2015-04-20 18:14:33 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:14:33 >> Authenticating ...\n"+
+            "2015-04-20 18:14:33 >> executing command...\n"+
+            "2015-04-20 18:14:33 >> sudo service jetty start\n"+
+            "2015-04-20 18:14:36 >> sudo: unable to resolve host sensapp-ml1\n"+
+            "Starting Jetty: process already running.\n"+
+            "\n"+
+            "2015-04-20 18:14:36 >> Closing connection ...\n"+
+            "2015-04-20 18:14:37 Looking for status changes..\n"+
+            "2015-04-20 18:14:38 >> Updating the model..\n"+
+            "2015-04-20 18:14:38 >> Status of: sensApp1 changed in: RUNNING\n"+
+            "2015-04-20 18:14:39 >> Updating the model..\n"+
+            "2015-04-20 18:14:39 >> Status of: SensAppAdmin(no_5) changed in: RUNNING\n"+
+            "2015-04-20 18:14:41 >> Updating the model..\n"+
+            "2015-04-20 18:14:41 >> Status of: JettySC(no_4) changed in: RUNNING\n"+
+            "2015-04-20 18:14:41 >> Connecting to openstack-nova ...\n"+
+            "2015-04-20 18:14:41 >> Authenticating ...\n"+
+            "2015-04-20 18:14:41 >> Closing connection ...\n"+
+            "2015-04-20 18:14:41 >> Scaling completed!\n";
+
+    var id=0;
+    var loaded=false;
+	var deployed=false;
+
+    jQuery(function($, undefined) {
+      $('#term_demo').terminal(function(command, term) {
+              if (command !== '') {
+					eval(command,term);
+                  try {
+                      switch(id%6) {
+                          case 0:
+                              validate0(command, term);
+                              break;
+                          case 1:
+                              validate1(command, term);
+                              break;
+                          case 2:
+                              validate2(command, term);
+                              break;
+                          case 3:
+                              validate3(command, term);
+                              break;
+                          case 4:
+                              validate4(command, term);
+                              break;
+                          case 5:
+                              validate5(command, term);
+                              break;
+                      }
+
+                  } catch(e) {
+                      term.error(new String(e));
+                  }
+              } else {
+                 term.echo('');
+              }
+          }, {
+              greetings: header,
+              name: 'js_demo',
+              height: 600,
+              prompt: 'CloudML > '
+          });
+    });
+    </script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $(".answer pre").hide();
+    });
+    $(document).ready(function () {
+        $(".exo").hide();
+    });
+    $(document).ready(function () {
+      $(".answer h2").click(function () {
+        $(this).next("pre").slideToggle('medium');
+      });
+    });
+
+	function eval(command, term){
+		if(command.indexOf("load deployment from ") > -1){
+			if(command.indexOf("load deployment from SensAppAdmin.json") > -1){
+			  term.echo(loadResult);
+			}else{
+			  term.echo(errorLoadResult);
+			}
+		}
+		if(command === 'help'){
+			term.echo(helpResult);
+		}
+		if(command === "deploy"){
+         if(loaded){
+            term.echo(deployResult);
+          }else{
+            term.echo("There is no deployment model currently loaded!");
+            term.echo("Please refer to exercice 2.");
+          }
+       }
+	   if(command.indexOf("list instances") > -1){
+			if(loaded){
+				if(deployed){
+					term.echo(listResult);
+				}else{
+					term.echo(errorList);
+				}
+			}else{
+				term.echo("There is no deployment model currently loaded!");
+				term.echo("Please refer to exercice 2.");
+			}
+		}
+		if(command.indexOf("scale out") > -1){
+			if(command.indexOf("scale out RegionOne/243472e4-3bfd-499c-8f5f-241946ca58eb") > -1){
+				if(deployed){
+					term.echo(scalingResult);
+				}
+			}else{
+				term.echo(errorScaleResult);
+			}
+		}
+		if(command.indexOf("store deployment") > -1){
+			if(loaded){
+				term.echo(storeResult);
+			}else{
+				term.echo("There is no deployment model currently loaded!");
+				term.echo("Please refer to exercice 2.");
+			}
+		}
+	}
+
+
+    function validate0(command, term){
+      if(command === 'help'){
+        next();
+		alertMessage("success", "Well Done! You reached next step!", 3000);
+      }
+    }
+
+    function validate1(command, term){
+      if(command.indexOf("load deployment from ") > -1){
+        if(command.indexOf("load deployment from SensAppAdmin.json") > -1){
+		  loaded=true;
+          next();
+		  alertMessage("success", "Well Done! You reached next step!", 3000);
+        }
+      }
+    }
+
+    function validate2(command, term){
+       if(command === "deploy"){
+         if(loaded){
+			deployed=true;
+            next();
+			alertMessage("success", "Well Done! You reached next step!", 3000);
+          }
+       }
+    }
+
+    function validate3(command, term){
+		if(command.indexOf("list instances") > -1){
+         if(deployed){
+            next();
+			alertMessage("success", "Well Done! You reached next step!", 3000);
+          }
+       }
+    }
+
+    function validate4(command, term){
+		if(command.indexOf("scale out") > -1){
+			if(command.indexOf("scale out RegionOne/243472e4-3bfd-499c-8f5f-241946ca58eb") > -1){
+				if(deployed){
+					next();
+					alertMessage("success", "Well Done! You reached next step!", 3000);
+				}
+			}
+		}
+    }
+
+    function validate5(command, term){
+		if(command.indexOf("store deployment") > -1){
+			if(deployed){
+				alertMessage("success", "Well done!", 5000);
+				window.open("https://github.com/SINTEF-9012/cloudml/raw/master/docs/samples/sensappAdmin-v2.json");
+			}
+		}
+    }
+
+    function next(){
+      $("#"+id%6).slideToggle('medium');
+      id++;
+      $("#"+id%6).slideToggle('medium');
+    }
+
+    function previous(){
+      $("#"+id%6).slideToggle('medium');
+      id--;
+      $("#"+id%6).slideToggle('medium');
+    }
+
+	  //Alert Messages
+		function alertMessage(type,message,timeout) {
+			alertDiv = $(document.createElement('div'));
+
+			switch (type) {
+					case "success":
+							alertDiv.attr("class","alert alert-success fade in")
+											.html("<b>Success.</b> "+message);
+							break;
+					case "error":
+							alertDiv.attr("class","alert alert-error fade in")
+											.html("<b>Error.</b> "+message);
+							break;
+					case "warning":
+							alertDiv.attr("class","alert fade in")
+											.html("<b>Warning.</b> "+message);
+							break;
+					default:
+							break;
+			}
+
+			alertDiv.append(
+							$(document.createElement('a'))
+									.attr("class","close")
+									.attr("data-dismiss","alert")
+									.html("&times;")
+					);
+
+			$('#alert-div').append(alertDiv);
+			if(typeof timeout!='undefined')
+					window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
+		}
+    </script>
+      </body>
+</html>
+
